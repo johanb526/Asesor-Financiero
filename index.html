@@ -201,7 +201,7 @@ select.form-input{cursor:pointer}
 <div class="overlay" id="setup-overlay">
   <div class="overlay-box">
     <div class="overlay-title">Configurar IA 🤖</div>
-    <div class="overlay-desc">Ingresa tu API key de Anthropic para activar el asesor con IA, análisis en tiempo real y lectura de PDFs.</div>
+    <div class="overlay-desc">Ingresa tu API key de Anthropic para usar la IA localmente. <strong style="color:var(--green)">En Vercel esto no es necesario</strong> — la key vive en el servidor.</div>
     <div class="form-group">
       <label class="form-label">API KEY DE ANTHROPIC</label>
       <input class="form-input" id="api-key-input" type="password" placeholder="sk-ant-api03-..." autocomplete="off">
@@ -457,10 +457,9 @@ select.form-input{cursor:pointer}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-// Cuando corres con server.js local, usa /api/chat
-// Cuando usas Vercel, configura la var de entorno ANTHROPIC_API_KEY
+// IS_LOCAL = true  → node server.js en tu computador (key ingresada por usuario)
+// IS_LOCAL = false → Vercel en producción (key en variable de entorno del servidor)
 const IS_LOCAL = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-const API_ENDPOINT = IS_LOCAL ? '/api/chat' : 'https://api.anthropic.com/v1/messages';
 
 let apiKey = localStorage.getItem('af_key') || '';
 let chatHistory = [];
@@ -482,7 +481,11 @@ document.addEventListener('DOMContentLoaded', () => {
     new Date().toLocaleTimeString('es-CO', {hour:'2-digit',minute:'2-digit'});
   const dateInput = document.getElementById('g-fecha');
   if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
-  if (apiKey) document.getElementById('setup-overlay').style.display = 'none';
+  // En Vercel (producción) nunca pedimos la key al usuario
+  // En local solo la pedimos si no está guardada
+  if (!IS_LOCAL || apiKey) {
+    document.getElementById('setup-overlay').style.display = 'none';
+  }
   renderGastos();
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -506,16 +509,17 @@ function showPage(id, btn) {
 }
 
 // ── AI CALL ─────────────────────────────────────────────
+// En Vercel: llama a /api/chat — la key vive en el servidor, nunca sale al cliente
+// En local:  llama a /api/chat también (server.js hace el proxy) o direct con key manual
 async function callAI(messages) {
-  if (!apiKey) { showOverlay('setup-overlay'); return null; }
-
   const headers = { 'Content-Type': 'application/json' };
-  if (!IS_LOCAL) {
+
+  if (IS_LOCAL) {
+    // Local: necesita key del usuario para pasarla al server.js proxy
+    if (!apiKey) { showOverlay('setup-overlay'); return null; }
     headers['x-api-key'] = apiKey;
-    headers['anthropic-version'] = '2023-06-01';
-  } else {
-    headers['x-api-key'] = apiKey; // el server.js lo pasa
   }
+  // En Vercel: NO se envía ninguna key — el servidor la lee de process.env
 
   const body = {
     model: 'claude-sonnet-4-20250514',
@@ -526,13 +530,13 @@ async function callAI(messages) {
   };
 
   try {
-    const res = await fetch(API_ENDPOINT, {
+    const res = await fetch('/api/chat', {
       method: 'POST',
       headers,
       body: JSON.stringify(body)
     });
     const data = await res.json();
-    if (data.error) return '⚠️ ' + data.error.message;
+    if (data.error) return '⚠️ ' + (data.error.message || JSON.stringify(data.error));
     let text = '';
     for (const b of (data.content || [])) { if (b.type === 'text') text += b.text; }
     return text || 'Sin respuesta.';
