@@ -1,0 +1,13 @@
+{
+  "name": "asesor-financiero-colombia",
+  "version": "2.0.0",
+  "description": "Asesor financiero personal con IA para invertir desde Colombia",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "ANTHROPIC_API_KEY='' node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
