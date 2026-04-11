@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AsesorFin">
+<meta name="theme-color" content="#00e5a0">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<title>Asesor Financiero · Colombia</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0f;--s1:#111118;--s2:#1a1a24;--s3:#22222e;--b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.11);--t1:#f0f0f5;--t2:#9999aa;--t3:#55556a;--green:#00e5a0;--gd:rgba(0,229,160,.12);--red:#ff4d6d;--rd:rgba(255,77,109,.12);--amber:#ffc24a;--ad:rgba(255,194,74,.12);--blue:#4d9fff;--bd:rgba(77,159,255,.12);--purple:#a78bfa;--pd:rgba(167,139,250,.12);--r:10px;--rl:14px;--rxl:20px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;font-size:14px;overscroll-behavior:none}
+.app{display:flex;flex-direction:column;height:100%;max-width:430px;margin:0 auto}
+header{padding:calc(16px + env(safe-area-inset-top,0px)) 20px 14px;background:rgba(10,10,15,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;flex-shrink:0}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:-.5px}
+.logo em{color:var(--green);font-style:normal}
+.live-pill{display:flex;align-items:center;gap:5px;background:var(--gd);border:1px solid rgba(0,229,160,.2);padding:3px 9px;border-radius:20px;cursor:pointer}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.live-txt{font-size:10px;color:var(--green);font-family:'DM Mono',monospace}
+.ticker{display:flex;gap:20px;padding:10px 20px;overflow-x:auto;border-bottom:1px solid var(--b1);background:var(--s1);scrollbar-width:none;flex-shrink:0}
+.ticker::-webkit-scrollbar{display:none}
+.tk{flex-shrink:0}.tk-n{font-size:9px;color:var(--t3);font-family:'DM Mono',monospace;text-transform:uppercase}.tk-p{font-size:12px;font-weight:500;font-family:'DM Mono',monospace}.tk-c{font-size:9px;padding:1px 5px;border-radius:4px;font-family:'DM Mono',monospace}
+.up{color:var(--green);background:var(--gd)}.down{color:var(--red);background:var(--rd)}.flat{color:var(--amber);background:var(--ad)}
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.content::-webkit-scrollbar{display:none}
+.page{display:none;padding:16px 16px calc(90px + env(safe-area-inset-bottom,0px))}
+.page.active{display:block}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(10,10,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(--b2);display:flex;padding:8px 4px calc(8px + env(safe-area-inset-bottom,0px));z-index:50}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;background:none;border:none;cursor:pointer;border-radius:var(--r)}
+.nav-btn.active .nav-icon,.nav-btn.active .nav-label{color:var(--green)}
+.nav-icon{font-size:18px;color:var(--t3)}.nav-label{font-size:9px;color:var(--t3);font-family:'DM Mono',monospace}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:16px;margin-bottom:12px}
+.ct{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;color:var(--t1)}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.metric{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:12px}
+.ml{font-size:10px;color:var(--t3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.mv{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
+.md{font-size:10px;color:var(--t2);margin-top:2px;font-family:'DM Mono',monospace}
+.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--b1);font-size:12px;gap:8px}
+.row:last-child{border-bottom:none}
+.rl{color:var(--t2);flex:1;line-height:1.4}.rv{font-weight:500;text-align:right;white-space:nowrap}
+.badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:5px;font-family:'DM Mono',monospace;font-weight:500}
+.b-buy{background:var(--gd);color:var(--green);border:1px solid rgba(0,229,160,.2)}
+.b-hold{background:var(--ad);color:var(--amber);border:1px solid rgba(255,194,74,.2)}
+.b-watch{background:var(--bd);color:var(--blue);border:1px solid rgba(77,159,255,.2)}
+.b-caution{background:var(--rd);color:var(--red);border:1px solid rgba(255,77,109,.2)}
+.btn{padding:9px 16px;border-radius:var(--r);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px;border:none;width:100%;justify-content:center}
+.btn-green{background:var(--gd);border:1px solid rgba(0,229,160,.25);color:var(--green)}
+.btn-ghost{background:var(--s2);border:1px solid var(--b2);color:var(--t2)}
+.btn-sm{padding:6px 12px;font-size:11px;width:auto}
+.al{padding:10px 13px;border-radius:0 var(--r) var(--r) 0;font-size:12px;line-height:1.6;margin-bottom:8px}
+.al-g{background:var(--gd);border-left:3px solid var(--green);color:var(--green)}
+.al-w{background:var(--ad);border-left:3px solid var(--amber);color:var(--amber)}
+.al-r{background:var(--rd);border-left:3px solid var(--red);color:var(--red)}
+.al-b{background:var(--bd);border-left:3px solid var(--blue);color:var(--blue)}
+.bar-r{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-l{font-size:11px;color:var(--t2);width:105px;flex-shrink:0}
+.bar-t{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden}
+.bar-f{height:100%;border-radius:2px}
+.bar-v{font-size:11px;font-weight:500;min-width:85px;text-align:right}
+.tabs{display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap}
+.tab{padding:5px 11px;border:0.5px solid var(--b2);border-radius:20px;font-size:11px;cursor:pointer;background:transparent;color:var(--t2);flex-shrink:0}
+.tab.active{background:var(--gd);border-color:rgba(0,229,160,.3);color:var(--green);font-weight:500}
+.sec{display:none}.sec.active{display:block}
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 290px);min-height:300px}
+.chat-msgs{flex:1;overflow-y:auto;background:var(--s2);border-radius:var(--rl);padding:12px;margin-bottom:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.chat-msgs::-webkit-scrollbar{display:none}
+.msg{margin-bottom:10px}
+.msg-bubble{padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.6;max-width:90%}
+.msg.ai .msg-bubble{background:var(--s1);border:1px solid var(--b1);border-radius:3px 12px 12px 12px}
+.msg.user .msg-bubble{background:var(--gd);border:1px solid rgba(0,229,160,.2);margin-left:auto;border-radius:12px 3px 12px 12px}
+.msg-from{font-size:9px;color:var(--t3);font-family:'DM Mono',monospace;margin-bottom:3px}
+.msg.user .msg-from{text-align:right}
+.chat-inp-row{display:flex;gap:8px}
+.chat-inp{flex:1;padding:10px 13px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none}
+.chat-inp:focus{border-color:var(--green)}
+.qq-wrap{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.qq{padding:4px 9px;background:var(--s2);border:1px solid var(--b1);border-radius:20px;font-size:11px;color:var(--t2);cursor:pointer}
+.qq:active{border-color:var(--green);color:var(--green);background:var(--gd)}
+.typing{display:flex;gap:3px;align-items:center;padding:9px 13px}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:bounce 1.1s infinite}
+.dot:nth-child(2){animation-delay:.18s}.dot:nth-child(3){animation-delay:.36s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.gtabs{display:flex;gap:5px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.gtabs::-webkit-scrollbar{display:none}
+.gtab{padding:6px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:20px;font-size:11px;color:var(--t2);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.gtab.active{background:var(--gd);border-color:rgba(0,229,160,.3);color:var(--green)}
+.drop-zone{border:2px dashed var(--b2);border-radius:var(--rl);padding:28px 20px;text-align:center;cursor:pointer;background:var(--s2);margin-bottom:12px}
+.drop-zone:active{border-color:var(--green);background:var(--gd)}
+.form-g{margin-bottom:12px}
+.form-l{font-size:11px;color:var(--t2);font-family:'DM Mono',monospace;margin-bottom:5px;display:block}
+.form-i{width:100%;padding:9px 12px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none}
+.form-i:focus{border-color:var(--green)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gasto-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--b1)}
+.gasto-item:last-child{border-bottom:none}
+.gasto-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.gasto-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:14px;padding:2px 6px;flex-shrink:0}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.obox{background:var(--s1);border:1px solid var(--b2);border-radius:var(--rxl);padding:28px 24px;width:100%;max-width:380px}
+.otitle{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px}
+.odesc{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:20px}
+.onote{font-size:11px;color:var(--t3);margin-top:10px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="overlay" id="key-overlay">
+  <div class="obox">
+    <div class="otitle">Configurar IA</div>
+    <div class="odesc">Ingresa tu API key de Anthropic para activar noticias en tiempo real, análisis de mercados y lectura de extractos PDF.</div>
+    <div class="form-g">
+      <label class="form-l">ANTHROPIC API KEY</label>
+      <input class="form-i" id="key-inp" type="password" placeholder="sk-ant-api03-..." autocomplete="off">
+    </div>
+    <button class="btn btn-green" style="margin-bottom:8px;font-size:14px" onclick="saveKey()">Activar asesor →</button>
+    <button class="btn btn-ghost" style="font-size:12px" onclick="document.getElementById('key-overlay').style.display='none'">Cerrar</button>
+    <div class="onote">
+      Obtén tu key en <strong>console.anthropic.com</strong> → API Keys → Create Key.<br>
+      Se guarda solo en tu dispositivo. Los primeros $5 USD son gratis.
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">ASESOR <em>FIN</em></div>
+  <div class="live-pill" onclick="document.getElementById('key-overlay').style.display='flex'" title="Configurar API Key">
+    <div class="live-dot"></div>
+    <span class="live-txt" id="hdr-time">--:--</span>
+  </div>
+</header>
+
+<div class="ticker">
+  <div class="tk"><div class="tk-n">COLCAP</div><div class="tk-p">2.387</div><div class="tk-c up">+0.82%</div></div>
+  <div class="tk"><div class="tk-n">S&P 500</div><div class="tk-p">5.396</div><div class="tk-c down">-1.23%</div></div>
+  <div class="tk"><div class="tk-n">USD/COP</div><div class="tk-p">$4.108</div><div class="tk-c flat">-0.31%</div></div>
+  <div class="tk"><div class="tk-n">EUR/COP</div><div class="tk-p">$4.257</div><div class="tk-c up">+1.31%</div></div>
+  <div class="tk"><div class="tk-n">VOO</div><div class="tk-p">$495.20</div><div class="tk-c down">-1.18%</div></div>
+  <div class="tk"><div class="tk-n">NVDA</div><div class="tk-p">$878.50</div><div class="tk-c up">+2.14%</div></div>
+  <div class="tk"><div class="tk-n">ECOPETROL</div><div class="tk-p">$2.580</div><div class="tk-c down">-0.77%</div></div>
+  <div class="tk"><div class="tk-n">WTI</div><div class="tk-p">$71.40</div><div class="tk-c down">-0.54%</div></div>
+  <div class="tk"><div class="tk-n">ORO</div><div class="tk-p">$3.140</div><div class="tk-c up">+0.49%</div></div>
+</div>
+
+<div class="content">
+
+<!-- INICIO -->
+<div class="page active" id="page-inicio">
+  <div class="metrics">
+    <div class="metric"><div class="ml">Patrimonio</div><div class="mv" style="color:var(--green)">$106.3M</div><div class="md">COP total</div></div>
+    <div class="metric"><div class="ml">A invertir</div><div class="mv">~$18.5M</div><div class="md">Nu disponible</div></div>
+    <div class="metric"><div class="ml">600 EUR</div><div class="mv" style="color:var(--purple)">~$2.55M</div><div class="md">próx. meses</div></div>
+    <div class="metric"><div class="ml">DCA/mes</div><div class="mv">$2.8M</div><div class="md">desde salario</div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Activos</div>
+    <div class="row"><span class="rl">Pibank <span style="font-size:10px;color:var(--t3)">9% EA · sin transacciones</span></span><span class="rv" style="color:var(--green)">$26.7M</span></div>
+    <div class="row"><span class="rl">Nu Cajas <span style="font-size:10px;color:var(--t3)">líquido total</span></span><span class="rv" style="color:var(--green)">$54.0M</span></div>
+    <div class="row"><span class="rl">Cesantías</span><span class="rv">$15.4M</span></div>
+    <div class="row"><span class="rl">USD en efectivo</span><span class="rv">$1.900 USD</span></div>
+    <div class="row"><span class="rl">600 EUR <span style="font-size:10px;color:var(--t3)">próximos meses</span></span><span class="rv" style="color:var(--purple)">~$2.55M COP</span></div>
+  </div>
+  <div class="card">
+    <div class="ct">Distribución Nu $54M</div>
+    <div class="bar-r"><span class="bar-l">Mudanza + Duke</span><div class="bar-t"><div class="bar-f" style="width:57%;background:var(--red)"></div></div><span class="bar-v" style="color:var(--red)">$31.0M</span></div>
+    <div class="bar-r"><span class="bar-l">Para invertir</span><div class="bar-t"><div class="bar-f" style="width:34%;background:var(--green)"></div></div><span class="bar-v" style="color:var(--green)">$18.5M</span></div>
+    <div class="bar-r"><span class="bar-l">Colchón mudanza</span><div class="bar-t"><div class="bar-f" style="width:6%;background:var(--amber)"></div></div><span class="bar-v" style="color:var(--amber)">$3.0M</span></div>
+    <div class="bar-r"><span class="bar-l">Viaje Miami</span><div class="bar-t"><div class="bar-f" style="width:3%;background:var(--blue)"></div></div><span class="bar-v" style="color:var(--blue)">$1.5M</span></div>
+  </div>
+  <div class="card">
+    <div class="ct">Gastos reales — marzo 2026</div>
+    <div style="font-size:11px;color:var(--t3);margin-bottom:10px;font-family:'DM Mono',monospace">Extracto Banco de Bogotá · $2.079M total</div>
+    <div class="bar-r"><span class="bar-l">Salidas</span><div class="bar-t"><div class="bar-f" style="width:33%;background:#E24B4A"></div></div><span class="bar-v" style="color:#E24B4A">$649K · 31%</span></div>
+    <div class="bar-r"><span class="bar-l">Otros</span><div class="bar-t"><div class="bar-f" style="width:22%;background:#888780"></div></div><span class="bar-v" style="color:var(--t2)">$455K · 22%</span></div>
+    <div class="bar-r"><span class="bar-l">Entretenimiento</span><div class="bar-t"><div class="bar-f" style="width:16%;background:#7F77DD"></div></div><span class="bar-v" style="color:#7F77DD">$323K · 16%</span></div>
+    <div class="bar-r"><span class="bar-l">Transporte</span><div class="bar-t"><div class="bar-f" style="width:14%;background:#378ADD"></div></div><span class="bar-v" style="color:#378ADD">$297K · 14%</span></div>
+    <div class="bar-r"><span class="bar-l">Ropa</span><div class="bar-t"><div class="bar-f" style="width:7%;background:#D85A30"></div></div><span class="bar-v" style="color:#D85A30">$145K · 7%</span></div>
+    <div class="bar-r"><span class="bar-l">Hogar</span><div class="bar-t"><div class="bar-f" style="width:5%;background:#4d9fff"></div></div><span class="bar-v" style="color:#4d9fff">$113K · 5%</span></div>
+    <div class="bar-r"><span class="bar-l">Deportes</span><div class="bar-t"><div class="bar-f" style="width:5%;background:var(--green)"></div></div><span class="bar-v" style="color:var(--green)">$97K · 5%</span></div>
+  </div>
+  <div class="card">
+    <div class="ct">Próximos pasos</div>
+    <div class="row"><span class="badge b-buy">HOY</span><span class="rl" style="margin-left:8px">Abrir cuenta Hapi · app.hapi.trade</span></div>
+    <div class="row"><span class="badge b-hold">MAYO</span><span class="rl" style="margin-left:8px">Viaje Miami — $1.500 USD</span></div>
+    <div class="row"><span class="badge b-watch">JUNIO</span><span class="rl" style="margin-left:8px">Primera compra VOO · $400 USD</span></div>
+    <div class="row"><span class="badge" style="background:var(--pd);color:var(--purple);border:1px solid rgba(167,139,250,.2)">EUR</span><span class="rl" style="margin-left:8px">600 EUR → 60% ETFs USD al recibirlos</span></div>
+    <div class="row"><span class="badge b-watch">JUL+</span><span class="rl" style="margin-left:8px">DCA $2.8M/mes en ETFs + BVC</span></div>
+  </div>
+  <button class="btn btn-green" onclick="askAI('Analiza el mercado hoy 10 de abril 2026. Busca noticias del S&P, COLCAP y dame señal concreta para mi portafolio de $18.5M COP.')">Analizar mercado ahora ↗</button>
+</div>
+
+<!-- MERCADOS -->
+<div class="page" id="page-mercados">
+  <div class="tabs">
+    <button class="tab active" onclick="showMTab('bvc',this)">BVC Colombia</button>
+    <button class="tab" onclick="showMTab('usa',this)">Wall Street</button>
+    <button class="tab" onclick="showMTab('noticias',this)">Noticias</button>
+  </div>
+  <div id="mt-bvc">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="ct" style="margin-bottom:0">Top BVC · abril 2026</div>
+        <button class="btn btn-ghost btn-sm" onclick="askAI('Busca noticias actualizadas de Davivienda PFDAVVND, GEB y Bancolombia BVC esta semana. ¿Cuál comprar ahora?')">IA ↺</button>
+      </div>
+      <div class="row"><span class="rl"><strong style="color:var(--t1)">PFDAVVND</strong> · Davivienda · P.obj $32.100</span><span class="rv"><span class="badge b-buy">COMPRAR</span></span></div>
+      <div class="row"><span class="rl"><strong style="color:var(--t1)">CIB</strong> · Grupo Cibest · P.obj $69.200</span><span class="rv"><span class="badge b-buy">COMPRAR</span></span></div>
+      <div class="row"><span class="rl"><strong style="color:var(--t1)">GEB</strong> · Energía Bogotá · P.obj $15.800</span><span class="rv"><span class="badge b-buy">COMPRAR</span></span></div>
+      <div class="row"><span class="rl"><strong style="color:var(--t1)">AVAL</strong> · Grupo Aval · P.obj $900</span><span class="rv"><span class="badge b-watch">VIGILAR</span></span></div>
+      <div class="row"><span class="rl"><strong style="color:var(--t1)">EXITO</strong> · Grupo Éxito</span><span class="rv"><span class="badge b-watch">VIGILAR</span></span></div>
+      <div class="row"><span class="rl"><strong style="color:var(--t1)">ECOPETROL</strong> · WTI $71.4 + caso Roa</span><span class="rv"><span class="badge b-caution">CAUTELA</span></span></div>
+    </div>
+    <div id="bvc-ia-res"></div>
+  </div>
+  <div id="mt-usa" style="display:none">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="ct" style="margin-bottom:0">Wall Street · abr 2026</div>
+        <button class="btn btn-ghost btn-sm" onclick="askAI('Busca precio y análisis de NVDA, MSFT, VOO y GEV hoy. ¿Cuál conviene con la caída del S&P por aranceles Trump?')">IA ↺</button>
+      </div>
+      <div class="row"><span class="rl"><strong style="color:var(--t1)">VOO</strong> · $495 · Vanguard S&P500</span><span class="rv"><span class="badge b-buy">CORE DCA</span></span></div>
+      <div class="row"><span class="rl"><strong style="color:var(--t1)">VT</strong> · $108 · Total World</span><span class="rv"><span class="badge b-buy">CORE DCA</span></span></div>
+      <div class="row"><span class="rl"><strong style="color:var(--t1)">NVDA</strong> · $878 · IA / centros datos</span><span class="rv"><span class="badge b-buy">FUERTE</span></span></div>
+      <div class="row"><span class="rl"><strong style="color:var(--t1)">MSFT</strong> · $412 · Azure +28%</span><span class="rv"><span class="badge b-buy">COMPRAR</span></span></div>
+      <div class="row"><span class="rl"><strong style="color:var(--t1)">GEV</strong> · $348 · Nuclear SMR</span><span class="rv"><span class="badge b-buy">COMPRAR</span></span></div>
+      <div class="row"><span class="rl"><strong style="color:var(--t1)">AMD</strong> · $164 · Data centers</span><span class="rv"><span class="badge b-watch">VIGILAR</span></span></div>
+    </div>
+    <div id="usa-ia-res"></div>
+  </div>
+  <div id="mt-noticias" style="display:none">
+    <button class="btn btn-ghost" style="margin-bottom:12px;font-size:12px" onclick="askAI('Busca las 6 noticias más importantes del mercado colombiano y Wall Street de esta semana 10 abril 2026. Incluye impacto para mi portafolio.')">Buscar noticias de hoy ↺</button>
+    <div class="card">
+      <div class="ct">Contexto · 10 abril 2026</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.7">S&P 500 bajo presión por aranceles Trump 25% acero/aluminio. Oro en máximos ($3.140). COLCAP alcista impulsado por sector financiero. Ecopetrol débil: WTI $71.4 + caso Roa. EUR sube — tus 600 EUR llegarán en buen momento.</div>
+    </div>
+    <div id="noticias-ia-res"></div>
+  </div>
+</div>
+
+<!-- GASTOS -->
+<div class="page" id="page-gastos">
+  <div class="gtabs">
+    <button class="gtab active" onclick="showGTab('manual',this)">✏ Manual</button>
+    <button class="gtab" onclick="showGTab('pdf',this)">📄 PDF</button>
+    <button class="gtab" onclick="showGTab('resumen',this)">📊 Resumen</button>
+  </div>
+  <div id="gt-manual">
+    <div class="card">
+      <div class="ct">Agregar gasto</div>
+      <div class="form-row">
+        <div class="form-g"><label class="form-l">DESCRIPCIÓN</label><input class="form-i" id="g-desc" placeholder="Rappi, Netflix..."></div>
+        <div class="form-g"><label class="form-l">MONTO ($COP)</label><input class="form-i" id="g-monto" type="number" placeholder="45000" inputmode="numeric"></div>
+      </div>
+      <div class="form-g">
+        <label class="form-l">CATEGORÍA</label>
+        <select class="form-i" id="g-cat">
+          <option value="domicilios">🛵 Domicilios (Rappi, iFood)</option>
+          <option value="salidas">🍽 Salidas (restaurantes, bares, paseos)</option>
+          <option value="entretenimiento">📺 Entretenimiento (Netflix, juegos)</option>
+          <option value="transporte">🚗 Transporte (Didi, Uber, celular)</option>
+          <option value="hogar">🏠 Hogar (internet, TV, servicios)</option>
+          <option value="deportes">💪 Deportes (gym, suplementos)</option>
+          <option value="ropa">👔 Ropa</option>
+          <option value="otros">📦 Otros</option>
+        </select>
+      </div>
+      <div class="form-g"><label class="form-l">FECHA</label><input class="form-i" id="g-fecha" type="date"></div>
+      <button class="btn btn-green" onclick="addGasto()">+ Agregar</button>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="ct" style="margin-bottom:0">Registrados</div>
+        <button class="btn btn-ghost btn-sm" onclick="if(confirm('¿Limpiar todo?')){gastos=[];saveG();renderG()}">Limpiar</button>
+      </div>
+      <div id="lista-g"><div style="font-size:12px;color:var(--t3);text-align:center;padding:16px">Sin gastos aún</div></div>
+    </div>
+  </div>
+  <div id="gt-pdf" style="display:none">
+    <div class="card">
+      <div class="ct">Analizar extracto bancario</div>
+      <div class="al al-b" style="margin-bottom:12px">Compatible con Banco de Bogotá, Bancolombia, Nu, Davivienda. Detecta automáticamente el formato de tabla.</div>
+      <div class="drop-zone" onclick="document.getElementById('pdf-file').click()">
+        <div style="font-size:32px;margin-bottom:8px">📄</div>
+        <div style="font-size:13px;color:var(--t2);margin-bottom:4px">Toca para seleccionar PDF</div>
+        <div style="font-size:11px;color:var(--t3)">Extracto bancario o de tarjeta de crédito</div>
+      </div>
+      <input type="file" id="pdf-file" accept=".pdf,application/pdf" style="display:none" onchange="handlePDF(event)">
+      <div id="pdf-status"></div>
+    </div>
+    <div id="pdf-result"></div>
+  </div>
+  <div id="gt-resumen" style="display:none">
+    <div class="card">
+      <div class="ct">Distribución de gastos</div>
+      <div style="position:relative;height:180px;margin-bottom:12px"><canvas id="donut-gastos"></canvas></div>
+      <div id="gastos-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px"></div>
+    </div>
+    <div class="card">
+      <div class="ct">Totales por categoría</div>
+      <div id="gastos-totales"></div>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:10px;color:var(--t3);font-family:'DM Mono',monospace;margin-bottom:4px">TOTAL PERÍODO</div>
+      <div style="font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--red)" id="gastos-total-num">$0</div>
+    </div>
+    <button class="btn btn-green" onclick="askAI('Mis gastos del período están registrados. Dame un plan concreto para reducir al menos $400K mensuales y aumentar mi DCA de inversión. Enfócate en salidas y entretenimiento.')">Optimizar gastos con IA ↗</button>
+  </div>
+</div>
+
+<!-- ASESOR IA -->
+<div class="page" id="page-ia">
+  <div class="qq-wrap">
+    <button class="qq" onclick="askAI('¿Es buen momento para comprar VOO hoy dado la caída del S&P por aranceles Trump?')">VOO hoy?</button>
+    <button class="qq" onclick="askAI('Analiza Davivienda PFDAVVND vs GEB para invertir $3.7M COP. ¿Cuál primero?')">Davivienda vs GEB</button>
+    <button class="qq" onclick="askAI('Tengo 600 EUR próximamente a tasa EUR/COP $4.257. ¿Los convierto a pesos o invierto directo en ETFs en euros?')">600 EUR → ¿qué hago?</button>
+    <button class="qq" onclick="askAI('Busca noticias de Ecopetrol hoy. Con WTI a $71.4 y el caso Roa, ¿comprar o evitar?')">Ecopetrol hoy</button>
+    <button class="qq" onclick="askAI('Con $18.5M COP disponibles en Nu, dame un plan paso a paso: cuándo entrar, en qué orden y con qué montos.')">Plan $18.5M COP</button>
+    <button class="qq" onclick="askAI('TRM y perspectivas del dólar para mayo 2026. Viajo a Miami — ¿tengo suficiente con $1.900 USD?')">TRM y viaje Miami</button>
+  </div>
+  <div class="chat-wrap">
+    <div class="chat-msgs" id="chat-msgs">
+      <div class="msg ai">
+        <div class="msg-from">ASESOR IA</div>
+        <div class="msg-bubble">Hola Johan. Conozco tu situación: $106.3M COP en activos, $18.5M para invertir en Nu, 600 EUR próximamente, viaje a Miami en mayo, perfil agresivo a largo plazo.<br><br>Tengo búsqueda web en tiempo real. Pregúntame sobre el mercado de hoy, tus acciones o cualquier decisión financiera.</div>
+      </div>
+    </div>
+    <div class="chat-inp-row">
+      <input class="chat-inp" id="chat-inp" placeholder="Pregunta sobre el mercado..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="btn btn-green" style="width:auto;padding:10px 14px" onclick="sendChat()">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- PORTAFOLIO -->
+<div class="page" id="page-portafolio">
+  <div class="metrics">
+    <div class="metric"><div class="ml">Pibank</div><div class="mv" style="color:var(--green)">$26.7M</div><div class="md">9% EA · Emergencia</div></div>
+    <div class="metric"><div class="ml">Nu Cajas</div><div class="mv">$54.0M</div><div class="md">Líquido total ✓</div></div>
+    <div class="metric"><div class="ml">Cesantías</div><div class="mv">$15.4M</div><div class="md">Protegido</div></div>
+    <div class="metric"><div class="ml">USD + EUR</div><div class="mv" style="color:var(--purple)">~$10.5M</div><div class="md">$1.900 + 600€</div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Asignación recomendada ~$18.5M</div>
+    <div class="bar-r"><span class="bar-l">ETFs internac.</span><div class="bar-t"><div class="bar-f" style="width:45%;background:var(--blue)"></div></div><span class="bar-v" style="color:var(--blue)">45% · $8.3M</span></div>
+    <div class="bar-r"><span class="bar-l">Acciones BVC</span><div class="bar-t"><div class="bar-f" style="width:20%;background:var(--green)"></div></div><span class="bar-v" style="color:var(--green)">20% · $3.7M</span></div>
+    <div class="bar-r"><span class="bar-l">ETFs emergentes</span><div class="bar-t"><div class="bar-f" style="width:15%;background:var(--amber)"></div></div><span class="bar-v" style="color:var(--amber)">15% · $2.8M</span></div>
+    <div class="bar-r"><span class="bar-l">REITs</span><div class="bar-t"><div class="bar-f" style="width:10%;background:var(--purple)"></div></div><span class="bar-v" style="color:var(--purple)">10% · $1.9M</span></div>
+    <div class="bar-r"><span class="bar-l">Liquidez táctica</span><div class="bar-t"><div class="bar-f" style="width:10%;background:var(--t3)"></div></div><span class="bar-v">10% · $1.8M</span></div>
+    <div class="al al-b" style="margin-top:12px">600 EUR al recibirlos → 60% ETFs USD · 25% BVC · 15% liquidez</div>
+  </div>
+  <div class="card">
+    <div class="ct">Gastos marzo 2026 · análisis</div>
+    <div class="row"><span class="rl">Salidas (restaurantes/bares)</span><span class="rv" style="color:var(--red)">$649K · 31%</span></div>
+    <div class="row"><span class="rl">Entretenimiento <span style="font-size:10px;color:var(--t3)">(videojuego $220K puntual)</span></span><span class="rv" style="color:#7F77DD">$323K · 16%</span></div>
+    <div class="row"><span class="rl">Transporte (Didi ×17 + Comcel)</span><span class="rv" style="color:var(--blue)">$297K · 14%</span></div>
+    <div class="row"><span class="rl">Hogar (Movistar internet+TV)</span><span class="rv" style="color:#4d9fff">$113K · 5%</span></div>
+    <div class="row"><span class="rl">Deportes (Smart Fit)</span><span class="rv" style="color:var(--green)">$97K · 5%</span></div>
+    <div class="row"><span class="rl" style="color:var(--green)">Pagó saldo completo ✓ — $0 intereses</span><span class="rv"><span class="badge b-buy">EXCELENTE</span></span></div>
+  </div>
+</div>
+
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="showPage('inicio',this)"><span class="nav-icon">⌂</span><span class="nav-label">Inicio</span></button>
+  <button class="nav-btn" onclick="showPage('mercados',this)"><span class="nav-icon">◈</span><span class="nav-label">Mercados</span></button>
+  <button class="nav-btn" onclick="showPage('gastos',this)"><span class="nav-icon">$</span><span class="nav-label">Gastos</span></button>
+  <button class="nav-btn" onclick="showPage('ia',this)"><span class="nav-icon">◎</span><span class="nav-label">Asesor IA</span></button>
+  <button class="nav-btn" onclick="showPage('portafolio',this)"><span class="nav-icon">◷</span><span class="nav-label">Portafolio</span></button>
+</nav>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ── LLAMADA DIRECTA A ANTHROPIC ──────────────────────────────────────────
+// Sin servidor intermediario. Funciona desde HTTPS (Vercel) directamente.
+// El header 'anthropic-dangerous-direct-browser-access' es requerido por Anthropic
+// para llamadas desde el navegador — es oficial y seguro.
+const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
+const MODEL = 'claude-sonnet-4-20250514';
+let apiKey = localStorage.getItem('af_key') || '';
+
+const SYSTEM = `Eres asesor financiero de Johan Bolívar, colombiano 31 años:
+ACTIVOS ~$106.3M COP: Pibank $26.7M(9%EA intocable), Nu Cajas $54M(líquido), Cesantías $15.4M, USD $1.900(viaje Miami mayo <$1.500 presupuesto), 600 EUR próximos(~$2.55M COP).
+Nu: $31M→mudanza+Duke390G3 / $3M→colchón / $1.5M→viaje / ~$18.5M→invertir.
+Salario $7.8M/mes. DCA ~$2.8M/mes. Freelances $7-10k USD irregulares. Perfil AGRESIVO +5años, principiante.
+Gastos marzo2026 $2.08M: Salidas $649K(31%), Otros $455K(22%), Entretenimiento $323K(16%), Transporte $297K(14%), Ropa $145K(7%), Hogar(Movistar internet+TV) $113K(5%), Deportes $97K(5%). Paga cuotas al inicio del mes para evitar intereses. Pagó saldo completo → 0 intereses.
+Bróker: Hapi(ETFs), Trii(BVC), IBKR(>$10kUSD).
+Contexto abr2026: TRM$4.108, EUR/COP$4.257, COLCAP2387, S&P presionado aranceles Trump, Ecopetrol débil(WTI$71.4+caso Roa), Davivienda/GEB positivos, NVDA récord $68.1B.
+Responde en español, conciso y práctico. Usa web_search para datos en tiempo real.`;
+
+document.getElementById('hdr-time').textContent=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+const df=document.getElementById('g-fecha');if(df)df.value=new Date().toISOString().split('T')[0];
+if(apiKey)document.getElementById('key-overlay').style.display='none';
+
+function saveKey(){
+  const k=document.getElementById('key-inp').value.trim();
+  if(!k.startsWith('sk-')){alert('Key inválida — debe empezar con sk-ant-');return;}
+  apiKey=k;localStorage.setItem('af_key',k);
+  document.getElementById('key-overlay').style.display='none';
+}
+
+// ── AI CALL ───────────────────────────────────────────────────────────────
+let chatHistory=[];
+
+async function callAI(messages, maxTok=1000){
+  if(!apiKey){document.getElementById('key-overlay').style.display='flex';return null;}
+  try{
+    const r=await fetch(ANTHROPIC_URL,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':apiKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({model:MODEL,max_tokens:maxTok,system:SYSTEM,
+        tools:[{type:'web_search_20250305',name:'web_search'}],messages})
+    });
+    if(!r.ok){
+      const e=await r.json().catch(()=>({}));
+      const msg=e?.error?.message||`Error HTTP ${r.status}`;
+      if(r.status===401)return '⚠️ API key inválida. Toca el indicador verde arriba para actualizarla.';
+      return '⚠️ '+msg;
+    }
+    const d=await r.json();
+    let txt='';
+    for(const b of(d.content||[]))if(b.type==='text')txt+=b.text;
+    return txt||'Sin respuesta.';
+  }catch(e){
+    return '⚠️ Error: '+e.message;
+  }
+}
+
+// ── CHAT ──────────────────────────────────────────────────────────────────
+function appendMsg(role,text){
+  const box=document.getElementById('chat-msgs');
+  const d=document.createElement('div');
+  d.className='msg '+role;
+  d.innerHTML=`<div class="msg-from">${role==='user'?'TÚ':'ASESOR IA'}</div>
+    <div class="msg-bubble">${text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>`;
+  box.appendChild(d);box.scrollTop=box.scrollHeight;
+}
+function showTyping(){
+  const box=document.getElementById('chat-msgs');
+  const d=document.createElement('div');
+  d.id='typ';d.className='msg ai';
+  d.innerHTML='<div class="msg-bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
+  box.appendChild(d);box.scrollTop=box.scrollHeight;
+}
+function hideTyping(){const e=document.getElementById('typ');if(e)e.remove();}
+
+async function sendChat(preset){
+  const inp=document.getElementById('chat-inp');
+  const q=preset||inp.value.trim();
+  if(!q)return;
+  inp.value='';
+  showPage('ia',document.querySelectorAll('.nav-btn')[3]);
+  appendMsg('user',q);
+  chatHistory.push({role:'user',content:q});
+  showTyping();
+  const r=await callAI(chatHistory);
+  hideTyping();
+  if(r){appendMsg('ai',r);chatHistory.push({role:'assistant',content:r});}
+}
+async function askAI(q){await sendChat(q);}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+function showMTab(id,btn){
+  ['bvc','usa','noticias'].forEach(t=>{document.getElementById('mt-'+t).style.display=t===id?'block':'none';});
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function showGTab(id,btn){
+  ['manual','pdf','resumen'].forEach(t=>{document.getElementById('gt-'+t).style.display=t===id?'block':'none';});
+  document.querySelectorAll('.gtab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(id==='resumen')renderDonut();
+}
+
+// ── GASTOS ────────────────────────────────────────────────────────────────
+const CATS={
+  domicilios:{label:'Domicilios',emoji:'🛵',color:'#ff6b6b'},
+  salidas:{label:'Salidas',emoji:'🍽',color:'#E24B4A'},
+  entretenimiento:{label:'Entretenimiento',emoji:'📺',color:'#7F77DD'},
+  transporte:{label:'Transporte',emoji:'🚗',color:'#378ADD'},
+  hogar:{label:'Hogar',emoji:'🏠',color:'#4d9fff'},
+  deportes:{label:'Deportes',emoji:'💪',color:'#00e5a0'},
+  ropa:{label:'Ropa',emoji:'👔',color:'#D85A30'},
+  otros:{label:'Otros',emoji:'📦',color:'#888780'},
+};
+let gastos=JSON.parse(localStorage.getItem('af_gastos')||'[]');
+function saveG(){localStorage.setItem('af_gastos',JSON.stringify(gastos));}
+
+function addGasto(){
+  const desc=document.getElementById('g-desc').value.trim();
+  const monto=parseFloat(document.getElementById('g-monto').value);
+  const cat=document.getElementById('g-cat').value;
+  const fecha=document.getElementById('g-fecha').value;
+  if(!desc||!monto||monto<=0){alert('Completa descripción y monto');return;}
+  gastos.push({id:Date.now(),desc,monto,cat,fecha:fecha||new Date().toISOString().split('T')[0]});
+  saveG();renderG();
+  document.getElementById('g-desc').value='';
+  document.getElementById('g-monto').value='';
+}
+
+function renderG(){
+  const el=document.getElementById('lista-g');
+  if(!gastos.length){el.innerHTML='<div style="font-size:12px;color:var(--t3);text-align:center;padding:16px">Sin gastos registrados</div>';return;}
+  el.innerHTML=[...gastos].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(g=>{
+    const c=CATS[g.cat]||CATS.otros;
+    return `<div class="gasto-item">
+      <div class="gasto-dot" style="background:${c.color}"></div>
+      <div style="flex:1"><div style="font-size:12px;color:var(--t1)">${g.desc}</div><div style="font-size:10px;color:var(--t3);font-family:'DM Mono',monospace">${c.emoji} ${c.label} · ${g.fecha}</div></div>
+      <div style="font-size:12px;font-family:'DM Mono',monospace;font-weight:500;color:var(--red)">-$${g.monto.toLocaleString('es-CO')}</div>
+      <button class="gasto-del" onclick="gastos=gastos.filter(x=>x.id!=${g.id});saveG();renderG()">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function getTotals(){
+  const t={};Object.keys(CATS).forEach(k=>t[k]=0);
+  gastos.forEach(g=>{if(t[g.cat]!==undefined)t[g.cat]+=g.monto;});
+  return t;
+}
+
+let donutChart=null;
+function renderDonut(){
+  const totals=getTotals();
+  const total=Object.values(totals).reduce((a,b)=>a+b,0);
+  document.getElementById('gastos-total-num').textContent='$'+total.toLocaleString('es-CO');
+  document.getElementById('gastos-totales').innerHTML=Object.entries(CATS).map(([k,c])=>{
+    const v=totals[k],pct=total>0?Math.round(v/total*100):0;
+    return `<div class="row"><span class="rl">${c.emoji} ${c.label}</span><span class="rv" style="color:${c.color}">$${v.toLocaleString('es-CO')} <span style="color:var(--t3)">(${pct}%)</span></span></div>`;
+  }).join('');
+  document.getElementById('gastos-legend').innerHTML=Object.entries(CATS).map(([k,c])=>
+    `<div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t2)"><div style="width:7px;height:7px;border-radius:50%;background:${c.color}"></div>${c.label}</div>`
+  ).join('');
+  const canvas=document.getElementById('donut-gastos');
+  if(!canvas)return;
+  if(donutChart){donutChart.destroy();donutChart=null;}
+  if(!total){return;}
+  donutChart=new Chart(canvas,{
+    type:'doughnut',
+    data:{
+      labels:Object.values(CATS).map(c=>c.label),
+      datasets:[{data:Object.keys(CATS).map(k=>totals[k]),backgroundColor:Object.values(CATS).map(c=>c.color),borderWidth:2,borderColor:'#111118'}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.label+': $'+ctx.raw.toLocaleString('es-CO')}}}}
+  });
+}
+
+// ── PDF PARSER ────────────────────────────────────────────────────────────
+function catGasto(d){
+  const u=d.toUpperCase();
+  if(/RAPPI|IFOOD|DOMICIL/.test(u))return'domicilios';
+  if(/DIDI|UBER|CABIFY|COMCEL|CLARO(?!S)|TIGO|WOM/.test(u))return'transporte';
+  if(/MOVISTAR|ETB|DIRECTV|CABLE/.test(u))return'hogar';
+  if(/NETFLIX|SPOTIFY|YOUTUBE|GOOGLE|MICROSOFT|PAGSEGURO|STEAM|XBOX|PLAYSTATION/.test(u))return'entretenimiento';
+  if(/SMART.?FIT|GYM|FITNESS|CREATINA|MAGNESIO|DECATHLON/.test(u))return'deportes';
+  if(/GEF|PUNTO BLANCO|ZARA|FOREVER|TENNIS|ARTURO CALLE/.test(u))return'ropa';
+  if(/PIZZA|FRISBY|CREPES|VAPIANO|TACOS|TOSTAO|JUAN VALDEZ|HORNITOS|RANDY|MCDONALD|DOMINO|PRESTO|SUBWAY|SUSHI|WAFFLES|MERA MERA|MADRIGUERA|NORTENOS|MONSERRAT|TELEFERICO|RESTAURAN|BAR |BOLD/.test(u))return'salidas';
+  return'otros';
+}
+
+function parseBancoColombia(text){
+  const result=[];
+  const SKIP=['PAGO T.CREDITO','FIN MOVIMIENTO','PAGOS Y CREDITO','SALDO ANTERIOR'];
+  for(const line of text.split('\n')){
+    const lu=line.toUpperCase();
+    if(SKIP.some(s=>lu.includes(s)))continue;
+    // Formato Banco de Bogotá: 8dígitos DESCRIPCION DD/MM/YYYY DD/MM/YYYY PLAZO VAL_ORIG TASA CUOTA_MES CUOTAS SALDO
+    const m=line.match(/(\d{8})\s+(.+?)\s+(\d{2}\/\d{2}\/\d{4})\s+\d{2}\/\d{2}\/\d{4}\s+(\d+)\s+([\d,]+)\s+([\d.]+)\s+([\d,]+)\s+\d+\s+[\d,]+/);
+    if(!m)continue;
+    const desc=m[2].trim();
+    const plazo=parseInt(m[4]);
+    const valOrig=parseInt(m[5].replace(/,/g,''));
+    const cuotaMes=parseInt(m[7].replace(/,/g,''));
+    const monto=plazo>1?cuotaMes:valOrig;
+    if(!monto||monto<=0||monto>50000000)continue;
+    const fp=m[3].split('/');
+    result.push({id:Date.now()+Math.random(),desc:desc.substring(0,45),monto,cat:catGasto(desc),fecha:`${fp[2]}-${fp[1]}-${fp[0]}`});
+  }
+  return result;
+}
+
+async function handlePDF(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  event.target.value='';
+  const status=document.getElementById('pdf-status');
+  const result=document.getElementById('pdf-result');
+  status.innerHTML='<div class="al al-b">📄 Leyendo PDF...</div>';
+  result.innerHTML='';
+  try{
+    const buf=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:new Uint8Array(buf)}).promise;
+    let fullText='';
+    for(let i=1;i<=Math.min(pdf.numPages,15);i++){
+      const page=await pdf.getPage(i);
+      const tc=await page.getTextContent();
+      fullText+=tc.items.map(it=>it.str).join(' ')+'\n';
+    }
+    status.innerHTML='<div class="al al-b">🔍 Buscando transacciones...</div>';
+
+    // Intento 1: parser directo (probado con Banco de Bogotá)
+    const directG=parseBancoColombia(fullText);
+    if(directG.length>0){finalizarPDF(directG,status,result,'Automático');return;}
+
+    // Intento 2: IA con texto
+    if(fullText.trim().length>50){
+      status.innerHTML='<div class="al al-b">🤖 Analizando con IA...</div>';
+      if(!apiKey){document.getElementById('key-overlay').style.display='flex';return;}
+      const prompt=`Extracto bancario colombiano. Extrae TODOS los gastos/cargos (no pagos/abonos).
+Para cuotas: usa "Valor Cuota Mes", NO el Valor Original.
+CATEGORIAS: domicilios/salidas/entretenimiento/transporte/hogar/deportes/ropa/otros
+Responde SOLO JSON válido: {"gastos":[{"desc":"Didi","monto":12500,"cat":"transporte","fecha":"2026-03-15"}]}
+Extracto:\n${fullText.substring(0,9000)}`;
+      const reply=await callAI([{role:'user',content:prompt}],2000);
+      if(reply&&!reply.startsWith('⚠️')){
+        const jm=reply.match(/\{[\s\S]*\}/);
+        if(jm){
+          try{const p=JSON.parse(jm[0]);if(p.gastos?.length>0){finalizarPDF(p.gastos,status,result,'IA texto');return;}}catch(_){}
+        }
+      }
+    }
+
+    // Intento 3: OCR con imágenes
+    status.innerHTML='<div class="al al-b">🖼️ PDF escaneado — aplicando OCR...</div>';
+    const images=[];
+    for(let i=1;i<=Math.min(pdf.numPages,4);i++){
+      const page=await pdf.getPage(i);
+      const vp=page.getViewport({scale:1.8});
+      const canvas=document.createElement('canvas');
+      canvas.width=vp.width;canvas.height=vp.height;
+      await page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;
+      images.push(canvas.toDataURL('image/jpeg',0.85).split(',')[1]);
+    }
+    if(!apiKey){document.getElementById('key-overlay').style.display='flex';return;}
+    const content=[...images.map(b=>({type:'image',source:{type:'base64',media_type:'image/jpeg',data:b}})),
+      {type:'text',text:'Extracto bancario colombiano. Extrae gastos. SOLO JSON: {"gastos":[{"desc":"Didi","monto":12500,"cat":"transporte","fecha":"2026-03-15"}]}. CATS: domicilios/salidas/entretenimiento/transporte/hogar/deportes/ropa/otros'}];
+    const r=await fetch(ANTHROPIC_URL,{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:MODEL,max_tokens:2000,system:'Analiza extractos bancarios. Responde solo JSON.',messages:[{role:'user',content}]})});
+    const d=await r.json();
+    let txt='';for(const b of(d.content||[]))if(b.type==='text')txt+=b.text;
+    const jm=txt.match(/\{[\s\S]*\}/);
+    if(jm){try{const p=JSON.parse(jm[0]);if(p.gastos?.length>0){finalizarPDF(p.gastos,status,result,'OCR+IA');return;}}catch(_){}}
+    status.innerHTML='<div class="al al-w">⚠️ No se encontraron transacciones. Verifica que el PDF sea un extracto con movimientos.</div>';
+  }catch(e){
+    status.innerHTML=`<div class="al al-r">❌ Error: ${e.message}</div>`;
+  }
+}
+
+function finalizarPDF(nuevos,status,result,metodo){
+  nuevos.forEach(g=>{
+    gastos.push({id:Date.now()+Math.random(),desc:g.desc||'Sin desc',monto:Math.abs(Number(g.monto))||0,cat:g.cat||'otros',fecha:g.fecha||new Date().toISOString().split('T')[0]});
+  });
+  saveG();renderG();
+  status.innerHTML=`<div class="al al-g">✅ ${nuevos.length} gastos importados (${metodo})</div>`;
+  result.innerHTML=`<div class="card"><div class="ct">${nuevos.length} transacciones importadas</div>
+    ${nuevos.slice(0,6).map(g=>{const c=CATS[g.cat||'otros']||CATS.otros;return`<div class="row"><span class="rl">${c.emoji} ${g.desc}</span><span class="rv" style="color:var(--red)">-$${Number(g.monto).toLocaleString('es-CO')}</span></div>`;}).join('')}
+    ${nuevos.length>6?`<div style="font-size:11px;color:var(--t3);text-align:center;padding:6px">+${nuevos.length-6} más</div>`:''}
+  </div>`;
+  setTimeout(()=>{showGTab('resumen',document.querySelectorAll('.gtab')[2]);},1000);
+}
+
+renderG();
+</script>
+</body>
+</html>
